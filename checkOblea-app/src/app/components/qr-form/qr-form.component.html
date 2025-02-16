@@ -1,28 +1,33 @@
-<!-- src/app/components/qr-form/qr-form.component.html -->
 <div class="qr-form-container" style="margin: 20px;">
   <form [formGroup]="qrForm">
-    <!-- Input para la patente -->
+    <!-- Campo para la patente -->
     <mat-form-field appearance="outline">
       <mat-label>Patente</mat-label>
       <input matInput formControlName="patente" placeholder="Ingrese la patente">
     </mat-form-field>
 
-    <!-- Input para el número de oblea, acompañado de un botón para escanear -->
+    <!-- Campo para el número de oblea -->
     <mat-form-field appearance="outline">
       <mat-label>Número de Oblea</mat-label>
-      <input matInput formControlName="oblea" placeholder="Escanee el QR" readonly>
-      <button mat-icon-button matSuffix type="button" (click)="activarEscaner()">
+      <!-- Si no está en modo manual, el input es solo lectura -->
+      <input matInput formControlName="oblea" placeholder="Escanee el QR o ingrese manualmente" [readonly]="!modoManual">
+      <!-- Botón para activar el escáner solo si no está en modo manual -->
+      <button mat-icon-button matSuffix type="button" *ngIf="!modoManual" (click)="activarEscaner()">
         <mat-icon>qr_code_scanner</mat-icon>
       </button>
     </mat-form-field>
 
-    <!-- Sección del escáner QR: se muestra solo cuando 'escaneando' es true -->
-    <div *ngIf="escaneando" style="margin-top: 10px;">
+    <!-- Botón para alternar entre modo manual y usar escáner -->
+    <button mat-button type="button" (click)="toggleModoManual()">
+      {{ modoManual ? 'Usar escáner' : 'Ingresar manualmente' }}
+    </button>
+
+    <!-- Se muestra el componente del escáner solo si se activa y no está en modo manual -->
+    <div *ngIf="escaneando && !modoManual" style="margin-top: 10px;">
       <zxing-scanner (scanSuccess)="onScanSuccess($event)"></zxing-scanner>
     </div>
 
-    <!-- Botón para enviar -->
+    <!-- Botón para enviar el formulario -->
     <button mat-raised-button color="primary" type="button" (click)="enviarDatos()">Enviar</button>
   </form>
 </div>
-

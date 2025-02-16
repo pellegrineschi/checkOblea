@@ -11,36 +11,48 @@ import { SocketService } from '../../services/socket.service';
 })
 export class QrFormComponent implements OnInit {
   qrForm!: FormGroup;
-  // Bandera para mostrar el escáner
   escaneando: boolean = false;
+  modoManual: boolean = false; // Variable para determinar si se ingresa manualmente el QR
 
   constructor(private fb: FormBuilder, private socketService: SocketService) { }
 
   ngOnInit(): void {
-    // Inicializar el formulario con dos campos: patente y oblea
     this.qrForm = this.fb.group({
       patente: [''],
       oblea: ['']
     });
   }
 
-  // Método que se dispara cuando el escáner QR obtiene un resultado
+  // Se ejecuta cuando el escáner detecta un código QR
   onScanSuccess(result: string) {
-    this.qrForm.patchValue({ oblea: result });
-    this.escaneando = false;
-  }
-
-  // Enviar el formulario al servidor vía Socket.IO
-  enviarDatos() {
-    if (this.qrForm.valid) {
-      this.socketService.enviarRegistro(this.qrForm.value);
-      // Opcional: limpiar el formulario o mostrar una notificación
-      this.qrForm.reset();
+    // Solo actualizamos si no estamos en modo manual
+    if (!this.modoManual) {
+      this.qrForm.patchValue({ oblea: result });
+      this.escaneando = false;
     }
   }
 
-  // Método para activar el escáner
+  // Envía los datos al servidor
+  enviarDatos() {
+    if (this.qrForm.valid) {
+      this.socketService.enviarRegistro(this.qrForm.value);
+      this.qrForm.reset();
+      // Al enviar, se restablece el modo manual (opcional)
+      this.modoManual = false;
+    }
+  }
+
+  // Activa el escáner QR
   activarEscaner() {
     this.escaneando = true;
+  }
+
+  // Alterna entre modo manual y modo escáner
+  toggleModoManual() {
+    this.modoManual = !this.modoManual;
+    // Si se activa el modo manual, se oculta el escáner
+    if (this.modoManual) {
+      this.escaneando = false;
+    }
   }
 }
