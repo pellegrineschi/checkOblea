@@ -1,1 +1,28 @@
-<p>qr-form works!</p>
+<!-- src/app/components/qr-form/qr-form.component.html -->
+<div class="qr-form-container" style="margin: 20px;">
+  <form [formGroup]="qrForm">
+    <!-- Input para la patente -->
+    <mat-form-field appearance="outline">
+      <mat-label>Patente</mat-label>
+      <input matInput formControlName="patente" placeholder="Ingrese la patente">
+    </mat-form-field>
+
+    <!-- Input para el número de oblea, acompañado de un botón para escanear -->
+    <mat-form-field appearance="outline">
+      <mat-label>Número de Oblea</mat-label>
+      <input matInput formControlName="oblea" placeholder="Escanee el QR" readonly>
+      <button mat-icon-button matSuffix type="button" (click)="activarEscaner()">
+        <mat-icon>qr_code_scanner</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- Sección del escáner QR: se muestra solo cuando 'escaneando' es true -->
+    <div *ngIf="escaneando" style="margin-top: 10px;">
+      <zxing-scanner (scanSuccess)="onScanSuccess($event)"></zxing-scanner>
+    </div>
+
+    <!-- Botón para enviar -->
+    <button mat-raised-button color="primary" type="button" (click)="enviarDatos()">Enviar</button>
+  </form>
+</div>
+
