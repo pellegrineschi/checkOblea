@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 const cors = require('cors');
 
@@ -15,6 +16,9 @@ const io = new Server(server, {
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Servir archivos estáticos del build de Angular
+app.use(express.static(path.join(__dirname, 'dist', 'check-oblea-app')));
 
 // Array para almacenar temporalmente los registros
 let registros = [];
@@ -38,7 +42,13 @@ io.on('connection', (socket) => {
   });
 });
 
-// Iniciar el servidor en el puerto 3000
-server.listen(3000, () => {
-  console.log('Servidor corriendo en http://localhost:3000');
+// Redirigir cualquier otra ruta al index.html del build Angular
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'check-oblea-app', 'index.html'));
+});
+
+// Configurar el puerto: en Glitch se usa process.env.PORT, en local 3000
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 });
